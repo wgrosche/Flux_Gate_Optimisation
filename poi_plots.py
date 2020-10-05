@@ -11,13 +11,13 @@ import numpy as np # For numerical fast numerical calculations
 import pandas as pd # Deals with data
 import seaborn as sns # Makes beautiful plots
 
-configuration = ["BabySFC","COMSOL","Corners", "50"]
+configuration = ["BabySFC","Generated","Corners_10000", "5"]
 sns.set_theme(style="darkgrid")
 
 poi_list = pd.DataFrame(np.array(pd.read_csv("Output"+configuration[0]+"/"+configuration[1]+"_Fields/poi/"+configuration[2]+"_50_"+configuration[3]+"_finalised_run.csv")), columns = ["0","1","2"])
 
 
-viewing_angle = [0,1]
+viewing_angle = [0,2]
 directions= ["x","y","z"]
 
 fig2 = plt.figure()
