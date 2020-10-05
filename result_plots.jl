@@ -14,10 +14,11 @@ include("plotting_functions.jl")
 ## Poi Plots
 
 ## BabySFC
-setup = "OutputBabySFC/Generated_Fields"
-file = "tims_tuned_SPSA_scaled"
+setup = "OutputBabySFC/Generated_Fields/poi"
+configuration = "fine_tuned" #Corners or Tim or fine_tuned
+scaling = "50_5"
 
-titles =  "Final Flux-Gate Positions for the Fine-Tuned Descent"
+titles =  "Final Flux-Gate Positions for the $(configuration) Descent at scaling $(scaling)"
 
 
 tile_size = 0.262 #m
@@ -31,8 +32,8 @@ g_2, vertex_positions_2 = cuboid_system([0.97, 0.97, 0.87], [6,6,6],
     skipfaces = [false, false, false, false, false, false])
 
 # load data
-poi  = readdlm("$(setup)/poi_$(file).csv" , ',' , Float64)[end-7:end,:]
-poi_2 = readdlm("$(setup)/poi_$(file).csv" , ',' , Float64)[1:8,:]
+poi  = readdlm("$(setup)/$(configuration)_$(scaling)_finalised_run.csv" , ',' , Float64)[end-7:end,:]
+poi_2 = readdlm("$(setup)/$(configuration)_$(scaling)_finalised_run.csv" , ',' , Float64)[1:8,:]
 
 # reformat final poi into similar format as poi in coils package
 poi_vecs = []
@@ -46,7 +47,7 @@ end
 plot_final(g, vertex_positions, poi_vecs, g_2, vertex_positions_2; standalone = true, alpha = 1, titles = titles)
 gcf()
 # save image
-gcf().savefig("$(setup)/Images/$(titles)_initial_final.png", dpi = 1000)
+gcf().savefig("Images/$(setup)/$(titles)_initial_final.png", dpi = 1000)
 
 
 
