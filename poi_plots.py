@@ -11,13 +11,14 @@ import numpy as np # For numerical fast numerical calculations
 import pandas as pd # Deals with data
 import seaborn as sns # Makes beautiful plots
 
-configuration = ["BabySFC","Generated","Corners_10000", "5"]
+configuration = ["BabySFC","Generated","Corners", "5"]
 sns.set_theme(style="darkgrid")
 
-poi_list = pd.DataFrame(np.array(pd.read_csv("Output"+configuration[0]+"/"+configuration[1]+"_Fields/poi/"+configuration[2]+"_50_"+configuration[3]+"_finalised_run.csv")), columns = ["0","1","2"])
+#poi_list = pd.DataFrame(np.array(pd.read_csv("Output"+configuration[0]+"/"+configuration[1]+"_Fields/poi/"+configuration[2]+"_50_"+configuration[3]+"_finalised_run.csv")), columns = ["0","1","2"])
 
+poi_list = pd.DataFrame(np.array(pd.read_csv("OutputBabySFC/Generated_Fields/num_sens_vals/poi_8_50_5_finalised_run.csv")), columns = ["0","1","2"])
 
-viewing_angle = [0,2]
+viewing_angle = [0,1]
 directions= ["x","y","z"]
 
 fig2 = plt.figure()
@@ -43,7 +44,7 @@ start_poi, = plt.plot(np.array(poi_list.values)[0:8,viewing_angle[0]], np.array(
 plt.title("POI for the Descent: ["+configuration[0]+","+configuration[1]+", "+configuration[2]+", 50:"+configuration[3]+"]")
 plt.xlabel(directions[viewing_angle[0]]+" [m]")
 plt.ylabel(directions[viewing_angle[1]]+" [m]")
-#plt.legend(handles=[black_patch, red_patch])
+
 first_legend = plt.legend(handles = [start_poi, end_poi], loc='best')
 
 fig2.savefig("WriteUp/"+configuration[1]+"_Plots/"+configuration[0]+"_"+configuration[2]+"_50_"+configuration[3]+"_view_"+str(viewing_angle[1]), bbox_inches='tight')
