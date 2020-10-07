@@ -131,8 +131,8 @@ function search_area_limits()
         MSR_centre = [0,0,143.625]*10^-3 #in m
         MSR_dim_outer = MSR_dim .+ 0.4
     end
-    limits_inner = [(MSR_dim.+MSR_centre)/2 (-(MSR_dim.-MSR_centre)/2)]
-    limits_outer = [(MSR_dim_outer.+MSR_centre)/2 (-(MSR_dim_outer.-MSR_centre)/2)]
+    limits_inner = [(MSR_dim/2 .+MSR_centre) (-(MSR_dim/2 .-MSR_centre))]
+    limits_outer = [(MSR_dim_outer/2 .+MSR_centre) (-(MSR_dim_outer/2 .-MSR_centre))]
     centre = MSR_centre
     return limits_inner, limits_outer, centre
 end
@@ -193,23 +193,27 @@ end
 function constrainer(theta)
     global constrained
     if constrained == true
-        max_vec_outer, min_vec_outer, max_vec_inner, min_vec_inner, search_centre = search_area(length(theta))
-        theta = max.(min_vec_outer[1:length(theta)], (min.(max_vec_outer[1:length(theta)], theta)))
-        for i in 1:length(theta)
-            if (theta[i] > min_vec_inner[i]) & (theta[i] < max_vec_inner[i])
-                if (theta[i] > search_centre[i])
-                    theta[i] = max_vec_inner[i]
-                else
-                    theta[i] = min_vec_inner[i]
+        max_vec_outer, min_vec_outer, max_vec_inner, min_vec_inner, search_centre = search_area(Int64(length(theta)/3))
+        theta_const = max.(min_vec_outer[1:length(theta)], (min.(max_vec_outer[1:length(theta)], theta)))
+        theta_const = transpose(reshape(theta_const, (3,:)))
+        for i in 1:Int64(length(theta_const)/3)
+            if (min_vec_inner[1] <theta_const[i,1] < max_vec_inner[1]) & (min_vec_inner[2] <theta_const[i,2] < max_vec_inner[2]) & (min_vec_inner[3] <theta_const[i,3] < max_vec_inner[3])
+                for j in 1:3
+                    if (theta_const[i,j] > search_centre[j])
+                        theta_const[i,j] = max_vec_inner[j]
+                    else
+                        theta_const[i,j] = min_vec_inner[j]
+                    end
                 end
             end
         end
-        return theta
+        return vec(transpose(theta_const))
     else
         return theta
     end
 end
 
+ 1<2<3
 
 ## Calculates the gradient at point theta with an SPSA method
 function SPSA_gradient(theta, k)
@@ -279,7 +283,7 @@ function make_arrays(vec_of_vec)
     len = Int64(length(vec_of_vec[1])/3)
     output = Array{Float64,2}(undef, length(vec_of_vec)*len,3)
     for i in 1:length(vec_of_vec)
-        output[len*(i-1)+1:len*i,:] = reshape(vec_of_vec[i], (:,3))
+        output[len*(i-1)+1:len*i,:] = transpose(reshape(vec_of_vec[i], (3,:)))
     end
     return output
 end
@@ -289,4 +293,9 @@ function saveresult(filename, file_poi, file_cond)
     global setup, filename_suffix
     writedlm("Output$(setup)/poi/$(filename)_$(filename_suffix).csv", make_arrays(file_poi),  ',')
     writedlm("Output$(setup)/cond/$(filename)_$(filename_suffix).csv", file_cond,  ',')
+end
+
+# function to calculate corners given inner and outer search limits
+function perm(n, mins, maxes)
+    return vec(collect(Iterators.product(collect(zip(mins,maxes))...)))
 end
