@@ -11,7 +11,7 @@ import seaborn as sns # Makes beautiful plots
 sns.set_theme(style="darkgrid")
 
 
-configuration = ["BabySFC","Generated","Corners_10000", "5"]
+configuration = ["BabySFC","Generated","fine_tuned", "5"]
 # cond_list = pd.DataFrame(np.array(pd.read_csv("OutputBabySFC/COMSOL_Fields/airss_end_conds_50_50_finalised_run.csv")), columns = ["before","after"])
 
 
