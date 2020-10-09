@@ -10,6 +10,11 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns
 
+
+configs = ["BabySFC", "PSI"]
+fields = ["Generated", "COMSOL"]
+starting= ["Corners", "Tim", "fine_tuned"]
+scalings = ["50","5"]
 configuration = ["BabySFC","Generated","airss_end_conds", "5"]
 
 

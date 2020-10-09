@@ -8,7 +8,7 @@ include("optimisation_functions.jl")
 
 ## System Initialisation
 
-setup = "PSI/Generated_Fields"  #Optimisation setup: can be "BabySFC/Generated_Fields" or
+setup = "BabySFC/Generated_Fields"  #Optimisation setup: can be "BabySFC/Generated_Fields" or
                                     #"BabySFC/COMSOL_Fields" or "PSI/Generated_Fields" or "PSI/COMSOL_Fields"
 constrained = true
 num_fields = 8
@@ -20,7 +20,7 @@ d = Binomial(1,prob)
 
 ## Input fields homogeneous & gradient
 hom_coeff = 50
-grad_coeff = 5
+grad_coeff = 50
 m = hom_coeff*10^-6 # teslas
 mg = grad_coeff*10^-6 # teslas
 Bgoals = [
@@ -66,7 +66,7 @@ for num_sensors in 4:20
 end
 
 
-## AIRSS Descent calculation
+# AIRSS Descent calculation
 print("Randomly Initialised Starting Conditions, Constrained, ($(setup)) ")
 # Descent Parameters
 n, a, c, alpha, gamma_var = 200, 1e-3, 0.01, 0.602, 0.101
@@ -91,7 +91,7 @@ end
 
 writedlm("Output$(setup)/airss_end_conds_$(filename_suffix).csv", airss_cond,  ',')
 
-## Fine tuning of the AIRSS method
+# Fine tuning of the AIRSS method
 n, a, c, alpha, gamma_var = 1000, 1e-3, 0.01, 0.602, 0.101
 A = n/10
 
@@ -101,14 +101,8 @@ saveresult("fine_tuned", tuning_poi, tuning_conds)
 
 ## Static Starting conditions: BabySFC Poi calculated by Tim Roethlisberger, Poi in the corners of the search domain for BabySFC and PSI
 
-# function to calculate corners given inner and outer search limits
-function perm(n, mins, maxes)
-    return [Tuple([(mins[i], maxes[i])[(t >> i) % 2+1] for i in 1:n]) for t in 1:(2^n)]
-end
-
 # poi calculated by tim
 tims_poi = [0.5, -0.47, 0.5, 0.5, -0.47, -0.5, -0.5, -0.47, 0.5, -0.5, -0.47, -0.5, 0,1,0.5,0,1,-0.5, 0,0.315,0.485,0,0.315,-0.485]
-
 
 max_mat = transpose(reshape(max_vec_outer[1:3], (3,:)))
 min_mat = transpose(reshape(min_vec_outer[1:3], (3,:)))
@@ -118,7 +112,8 @@ min_mat2 = transpose(reshape(min_vec_inner[1:3], (3,:)))
 side_poi_0 = collect(Iterators.flatten(perm(3, min_mat, max_mat)))
 side_poi_1 =collect(Iterators.flatten(perm(3, (min_mat+min_mat2)/2, (max_mat+max_mat2)/2)))
 
-n, a, c, alpha, gamma_var = 1000, 1e-3, 0.01, 0.602, 0.101
+
+n, a, c, alpha, gamma_var = 1000, 1e-2, 0.01, 0.602, 0.101
 A = n/10
 
 tim_poi, tim_cond = SPSA(initial_poi(8),tims_poi)

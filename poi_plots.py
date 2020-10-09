@@ -18,7 +18,7 @@ poi_list = pd.DataFrame(np.array(pd.read_csv("Output"+configuration[0]+"/"+confi
 
 #poi_list = pd.DataFrame(np.array(pd.read_csv("OutputBabySFC/Generated_Fields/num_sens_vals/poi_8_50_5_finalised_run.csv")), columns = ["0","1","2"])
 
-viewing_angle = [0,1]
+viewing_angle = [0,2]
 directions= ["x","y","z"]
 
 fig2 = plt.figure()
