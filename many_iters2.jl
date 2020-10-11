@@ -2,13 +2,15 @@ using DelimitedFiles, LinearAlgebra, Random, Distributions, PyPlot, JLD
 using PyCall
 @pyimport scipy.interpolate as si
 using Coils, Coils.CoilsPlot
+using Distributed
+using Base.Threads
 
 
 include("optimisation_functions.jl")
 
 ## System Initialisation
 
-setup = "PSI/Generated_Fields"  #Optimisation setup: can be "BabySFC/Generated_Fields" or
+setup = "BabySFC/Generated_Fields"  #Optimisation setup: can be "BabySFC/Generated_Fields" or
                                     #"BabySFC/COMSOL_Fields" or "PSI/Generated_Fields" or "PSI/COMSOL_Fields"
 constrained = true
 num_fields = 8
@@ -20,7 +22,7 @@ d = Binomial(1,prob)
 
 ## Input fields homogeneous & gradient
 hom_coeff = 50
-grad_coeff = 5
+grad_coeff = 50
 m = hom_coeff*10^-6 # teslas
 mg = grad_coeff*10^-6 # teslas
 Bgoals = [
@@ -45,29 +47,72 @@ end
 
 filename_suffix = "$(hom_coeff)_$(grad_coeff)_finalised_run"
 
+# AIRSS Descent calculation
+print("Randomly Initialised Starting Conditions, Constrained, ($(setup)) ")
+# Descent Parameters
+n, a, c, alpha, gamma_var = 500, 1e-3, 0.01, 0.602, 0.101
+A = n/10
+num_sensors = 8
 
-## Static Starting conditions: BabySFC Poi calculated by Tim Roethlisberger, Poi in the corners of the search domain for BabySFC and PSI
+airss_poi, airss_grad, airss_cond = [], [], []
+min_poi = initial_poi(num_sensors)
+min_cond = f(min_poi)
+# for i in 1:100 #try @parallel
+#     global min_cond, min_poi, min_grad
+#     poi_0, poi_1 = initial_poi(num_sensors), initial_poi(num_sensors)
+#     airss_poi_i, airss_cond_i = SPSA(poi_0, poi_1)
+#     push!(airss_poi, (last(airss_poi_i), airss_poi_i[1]))
+#     push!(airss_cond, (last(airss_cond_i), airss_cond_i[1]))
+#     print("Stepped: ",i, " Condition Number: ", last(airss_cond_i)," ")
+#     if last(min_cond) > last(airss_cond_i)
+#         min_cond, min_poi = airss_cond_i, airss_poi_i
+#         print("The minimal condition number has decreased to: " , last(min_cond), " ")
+#     end
+# end
+@threads for i in 1:100 #try @parallel
+    global min_cond, min_poi, min_grad
+    poi_0, poi_1 = initial_poi(num_sensors), initial_poi(num_sensors)
+    airss_poi_i, airss_cond_i = SPSA(poi_0, poi_1)
+    push!(airss_poi, (last(airss_poi_i), airss_poi_i[1]))
+    push!(airss_cond, (last(airss_cond_i), airss_cond_i[1]))
+    print("Stepped: ",i, " Condition Number: ", last(airss_cond_i)," ")
+    if last(min_cond) > last(airss_cond_i)
+        min_cond, min_poi = airss_cond_i, airss_poi_i
+        print("The minimal condition number has decreased to: " , last(min_cond), " ")
+    end
+end
 
-# poi calculated by tim
-tims_poi = [0.5, -0.47, 0.5, 0.5, -0.47, -0.5, -0.5, -0.47, 0.5, -0.5, -0.47, -0.5, 0,1,0.5,0,1,-0.5, 0,0.315,0.485,0,0.315,-0.485]
 
-max_mat = transpose(reshape(max_vec_outer[1:3], (3,:)))
-min_mat = transpose(reshape(min_vec_outer[1:3], (3,:)))
-max_mat2 = transpose(reshape(max_vec_inner[1:3], (3,:)))
-min_mat2 = transpose(reshape(min_vec_inner[1:3], (3,:)))
+writedlm("Output$(setup)/airss_end_conds_$(filename_suffix).csv", airss_cond,  ',')
 
-side_poi_0 = collect(Iterators.flatten(perm(3, min_mat, max_mat)))
-side_poi_1 =collect(Iterators.flatten(perm(3, (min_mat+min_mat2)/2, (max_mat+max_mat2)/2)))
-
-
+# Fine tuning of the AIRSS method
 n, a, c, alpha, gamma_var = 10000, 1e-3, 0.01, 0.602, 0.101
 A = n/10
 
-tim_poi, tim_cond = SPSA(initial_poi(8),tims_poi)
-
-saveresult("Tim_10000", tim_poi, tim_cond )
-
-corner_poi, corner_cond = SPSA(side_poi_0,side_poi_1)
-saveresult("Corners_10000", corner_poi, corner_cond )
-
-print("Descent Complete($(setup))")
+tuning_poi, tuning_conds = SPSA((min_poi[end-1]),(min_poi[end]))
+saveresult("fine_tuned", tuning_poi, tuning_conds)
+# ## Static Starting conditions: BabySFC Poi calculated by Tim Roethlisberger, Poi in the corners of the search domain for BabySFC and PSI
+#
+# # poi calculated by tim
+# tims_poi = [0.5, -0.47, 0.5, 0.5, -0.47, -0.5, -0.5, -0.47, 0.5, -0.5, -0.47, -0.5, 0,1,0.5,0,1,-0.5, 0,0.315,0.485,0,0.315,-0.485]
+#
+# max_mat = transpose(reshape(max_vec_outer[1:3], (3,:)))
+# min_mat = transpose(reshape(min_vec_outer[1:3], (3,:)))
+# max_mat2 = transpose(reshape(max_vec_inner[1:3], (3,:)))
+# min_mat2 = transpose(reshape(min_vec_inner[1:3], (3,:)))
+#
+# side_poi_0 = collect(Iterators.flatten(perm(3, min_mat, max_mat)))
+# side_poi_1 =collect(Iterators.flatten(perm(3, (min_mat+min_mat2)/2, (max_mat+max_mat2)/2)))
+#
+#
+# n, a, c, alpha, gamma_var = 10000, 1e-3, 0.01, 0.602, 0.101
+# A = n/10
+#
+# tim_poi, tim_cond = SPSA(initial_poi(8),tims_poi)
+#
+# saveresult("Tim_10000", tim_poi, tim_cond )
+#
+# corner_poi, corner_cond = SPSA(side_poi_0,side_poi_1)
+# saveresult("Corners_10000", corner_poi, corner_cond )
+#
+# print("Descent Complete($(setup))")
