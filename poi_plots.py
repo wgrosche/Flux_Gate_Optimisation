@@ -11,14 +11,14 @@ import numpy as np # For numerical fast numerical calculations
 import pandas as pd # Deals with data
 import seaborn as sns # Makes beautiful plots
 
-configuration = ["BabySFC","Generated","Tim", "50"]
+configuration = ["BabySFC","Generated","Corners_10000", "50"]
 sns.set_theme(style="darkgrid")
 
-poi_list = pd.DataFrame(np.array(pd.read_csv("Output"+configuration[0]+"/"+configuration[1]+"_Fields/poi/"+configuration[2]+"_50_"+configuration[3]+"_finalised_run.csv")), columns = ["0","1","2"])
+poi_list = pd.DataFrame(np.array(pd.read_csv("Output"+configuration[0]+"/"+configuration[1]+"_Fields/poi/"+configuration[2]+"_50_"+configuration[3]+"_finalised_run.csv", header = None)), columns = ["0","1","2"])
 
 #poi_list = pd.DataFrame(np.array(pd.read_csv("OutputBabySFC/Generated_Fields/num_sens_vals/poi_8_50_5_finalised_run.csv")), columns = ["0","1","2"])
 
-viewing_angle = [0,2]
+viewing_angle = [0,1]
 directions= ["x","y","z"]
 
 fig2 = plt.figure()
@@ -39,8 +39,8 @@ ax2.set_ylim([coils_centre[viewing_angle[1]]-coils_dim[viewing_angle[1]]/2-0.5,c
 ax2.add_patch(patches.Rectangle(coils_corner,coils_dim[viewing_angle[0]],coils_dim[viewing_angle[1]],fill=False, color = 'blue')) 
 ax2.add_patch(patches.Rectangle(msr_corner,msr_dim[viewing_angle[0]],msr_dim[viewing_angle[1]], fill=False, color = 'red'))
 end_poi, = plt.plot(np.array(poi_list.values)[-9:-1,viewing_angle[0]], np.array(poi_list.values)[-9:-1,viewing_angle[1]], 'kx', label = "End")
-start_poi, = plt.plot(np.array(poi_list.values)[8:16,viewing_angle[0]], np.array(poi_list.values)[8:16,viewing_angle[1]], 'rx', Label = "Start")
-plt.title("POI for the Descent: ["+configuration[0]+","+configuration[1]+", "+configuration[2]+", 50:"+configuration[3]+"]")
+start_poi, = plt.plot(np.array(poi_list.values)[0:8,viewing_angle[0]], np.array(poi_list.values)[0:8,viewing_angle[1]], 'rx', Label = "Start")
+plt.title("POI for the Descent: \n ["+configuration[0]+","+configuration[1]+", "+configuration[2]+", 50:"+configuration[3]+"]")
 plt.xlabel(directions[viewing_angle[0]]+" [m]")
 plt.ylabel(directions[viewing_angle[1]]+" [m]")
 

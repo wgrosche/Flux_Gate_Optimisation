@@ -4,6 +4,9 @@ using DelimitedFiles, LinearAlgebra, Random, Distributions, PyPlot, JLD
 using PyCall
 @pyimport scipy.interpolate as si
 using LightGraphs
+using Distributed
+using Base.Threads
+
 
 include("optimisation_functions.jl")
 ##investigating the stability of the condition number at the end of the optimisation
@@ -64,8 +67,8 @@ end
 
 output = Array{Float64,2}(undef, 8*length(range(-.1,stop = .1, step = 0.001)),7)
 ##output
-configuration = "fine_tuned" #Corners or Tim or fine_tuned
-scaling = "50_5"
+configuration = "fine_tuned_further_tuning" #Corners or Tim or fine_tuned
+scaling = "50_50"
 poi  = readdlm("Output$(setup)/poi/$(configuration)_$(scaling)_finalised_run.csv" , ',' , Float64)[end-7:end,:]
 
 
@@ -90,5 +93,5 @@ for i in eachindex(range(-0.1,stop = 0.1, step = 0.001))
     output[8*(i-1)+1:8*i,2:end] = pos_shift(poi, (range(-0.1,stop = 0.1, step = 0.001)[i]))
 end
 
-writedlm("Output$(setup)/Stability/$(configuration)_$(scaling)_finalised_run.csv",output2,  ',')
-writedlm("Output$(setup)/Stability/$(configuration)_$(scaling)_finalised_run_all.csv",output,  ',')
+writedlm("Output$(setup)/Stability/$(configuration)_$(scaling)_finalised_run_2.csv",output2,  ',')
+writedlm("Output$(setup)/Stability/$(configuration)_$(scaling)_finalised_run_all_2.csv",output,  ',')
