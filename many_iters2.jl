@@ -45,7 +45,7 @@ end
 
 ## Savedata Options
 #
-# filename_suffix = "$(hom_coeff)_$(grad_coeff)_finalised_run"
+filename_suffix = "$(hom_coeff)_$(grad_coeff)_finalised_run"
 #
 # print("Randomly Initialised Starting Conditions, Constrained, ($(setup)) ")
 # # Descent Parameters
