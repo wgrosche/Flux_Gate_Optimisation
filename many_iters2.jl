@@ -44,37 +44,38 @@ elseif setup == "BabySFC/COMSOL_Fields" || setup == "PSI/COMSOL_Fields"
 end
 
 ## Savedata Options
-
-filename_suffix = "$(hom_coeff)_$(grad_coeff)_finalised_run"
-
-print("Randomly Initialised Starting Conditions, Constrained, ($(setup)) ")
-# Descent Parameters
-n, a, c, alpha, gamma_var = 200, 1e-3, 0.01, 0.602, 0.101
-A = n/10
-num_sensors = 8
-
-airss_poi, airss_grad, airss_cond = [], [], []
-min_poi = initial_poi(num_sensors)
-min_cond = f(min_poi)
-@threads for i in 1:600 #try @parallel
-    global min_cond, min_poi, min_grad
-    poi_0, poi_1 = initial_poi(num_sensors), initial_poi(num_sensors)
-    airss_poi_i, airss_cond_i = SPSA(poi_0, poi_1)
-    push!(airss_poi, (last(airss_poi_i), airss_poi_i[1]))
-    push!(airss_cond, (last(airss_cond_i), airss_cond_i[1]))
-    print(" ",i, ", ")
-    #print("Stepped: ",i, " Condition Number: ", last(airss_cond_i)," ")
-    if last(min_cond) > last(airss_cond_i)
-        min_cond, min_poi = airss_cond_i, airss_poi_i
-        #print("The minimal condition number has decreased to: " , last(min_cond), " ")
-    end
-end
-
-writedlm("Output$(setup)/airss_end_conds_$(filename_suffix).csv", airss_cond,  ',')
-
+#
+# filename_suffix = "$(hom_coeff)_$(grad_coeff)_finalised_run"
+#
+# print("Randomly Initialised Starting Conditions, Constrained, ($(setup)) ")
+# # Descent Parameters
+# n, a, c, alpha, gamma_var = 200, 1e-3, 0.01, 0.602, 0.101
+# A = n/10
+# num_sensors = 8
+#
+# airss_poi, airss_grad, airss_cond = [], [], []
+# min_poi = initial_poi(num_sensors)
+# min_cond = f(min_poi)
+# @threads for i in 1:600 #try @parallel
+#     global min_cond, min_poi, min_grad
+#     poi_0, poi_1 = initial_poi(num_sensors), initial_poi(num_sensors)
+#     airss_poi_i, airss_cond_i = SPSA(poi_0, poi_1)
+#     push!(airss_poi, (last(airss_poi_i), airss_poi_i[1]))
+#     push!(airss_cond, (last(airss_cond_i), airss_cond_i[1]))
+#     print(" ",i, ", ")
+#     #print("Stepped: ",i, " Condition Number: ", last(airss_cond_i)," ")
+#     if last(min_cond) > last(airss_cond_i)
+#         min_cond, min_poi = airss_cond_i, airss_poi_i
+#         #print("The minimal condition number has decreased to: " , last(min_cond), " ")
+#     end
+# end
+#
+# writedlm("Output$(setup)/airss_end_conds_$(filename_suffix).csv", airss_cond,  ',')
+min_poi1 = vec(transpose(readdlm("OutputBabySFC/Generated_Fields/poi/fine_tuned_50_50_finalised_run.csv" , ',' , Float64)[end-7:end,:]))
+min_poi0 = vec(transpose(readdlm("OutputBabySFC/Generated_Fields/poi/fine_tuned_50_50_finalised_run.csv" , ',' , Float64)[end-15:end-8,:]))
 # Fine tuning of the AIRSS method
-n, a, c, alpha, gamma_var = 1000, 1e-3, 0.01, 0.602, 0.101
+n, a, c, alpha, gamma_var = 10000, 1e-3, 0.01, 0.602, 0.101
 A = n/10
 
-tuning_poi, tuning_conds = SPSA((min_poi[end-1]),(min_poi[end]))
-saveresult("fine_tuned", tuning_poi, tuning_conds)
+tuning_poi, tuning_conds = SPSA(min_poi0,min_poi1)
+saveresult("fine_tuned_more", tuning_poi, tuning_conds)

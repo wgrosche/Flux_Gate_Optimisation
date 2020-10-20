@@ -1,0 +1,3 @@
+\section{Thanks}
+
+Special thanks to Michal Rawlik for his Julia package Coils.jl. And to Jarrett Revels for the BenchmarkTools package.
