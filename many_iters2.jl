@@ -10,7 +10,7 @@ include("optimisation_functions.jl")
 
 ## System Initialisation
 
-setup = "BabySFC/Generated_Fields"  #Optimisation setup: can be "BabySFC/Generated_Fields" or
+setup = "PSI/COMSOL_Fields"  #Optimisation setup: can be "BabySFC/Generated_Fields" or
                                     #"BabySFC/COMSOL_Fields" or "PSI/Generated_Fields" or "PSI/COMSOL_Fields"
 constrained = true
 num_fields = 8
@@ -22,7 +22,7 @@ d = Binomial(1,prob)
 
 ## Input fields homogeneous & gradient
 hom_coeff = 50
-grad_coeff = 50
+grad_coeff = 5
 m = hom_coeff*10^-6 # teslas
 mg = grad_coeff*10^-6 # teslas
 Bgoals = [
@@ -70,12 +70,19 @@ filename_suffix = "$(hom_coeff)_$(grad_coeff)_finalised_run"
 #     end
 # end
 #
-# writedlm("Output$(setup)/airss_end_conds_$(filename_suffix).csv", airss_cond,  ',')
-min_poi1 = vec(transpose(readdlm("OutputBabySFC/Generated_Fields/poi/fine_tuned_50_50_finalised_run.csv" , ',' , Float64)[end-7:end,:]))
-min_poi0 = vec(transpose(readdlm("OutputBabySFC/Generated_Fields/poi/fine_tuned_50_50_finalised_run.csv" , ',' , Float64)[end-15:end-8,:]))
-# Fine tuning of the AIRSS method
-n, a, c, alpha, gamma_var = 10000, 1e-3, 0.01, 0.602, 0.101
+max_mat = transpose(reshape(max_vec_outer[1:3], (3,:)))
+min_mat = transpose(reshape(min_vec_outer[1:3], (3,:)))
+max_mat2 = transpose(reshape(max_vec_inner[1:3], (3,:)))
+min_mat2 = transpose(reshape(min_vec_inner[1:3], (3,:)))
+
+side_poi_0 = collect(Iterators.flatten(perm(3, min_mat, max_mat)))
+side_poi_1 =collect(Iterators.flatten(perm(3, (min_mat+min_mat2)/2, (max_mat+max_mat2)/2)))
+
+
+n, a, c, alpha, gamma_var = 30000, 1e-3, 0.01, 0.602, 0.101
 A = n/10
 
-tuning_poi, tuning_conds = SPSA(min_poi0,min_poi1)
-saveresult("fine_tuned_more", tuning_poi, tuning_conds)
+corner_poi, corner_cond = SPSA(side_poi_0,side_poi_1)
+saveresult("Corners_2", corner_poi, corner_cond )
+
+print("Descent Complete($(setup))")

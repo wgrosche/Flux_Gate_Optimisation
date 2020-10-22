@@ -123,7 +123,7 @@ function coupling_poi(poi)
     else
         poi_mat = transpose(reshape(poi, (3,:)))
         poi_val = Array{Float64,2}(undef, length(poi), length(fields_full))
-        @threads for i in 1:length(fields_full)
+        for i in 1:length(fields_full)
             if i >= 4
                 c = m/mg
             else

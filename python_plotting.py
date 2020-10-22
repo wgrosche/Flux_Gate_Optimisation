@@ -27,7 +27,7 @@ sns.set_theme(style="darkgrid")
 #                 plt.title("Condtion Number for the Descent: ["+configuration[0]+","+configuration[1]+", "+configuration[2]+", 50:"+configuration[3]+"]")
 #                 plot1.savefig("WriteUp/"+configuration[1]+"_Plots/"+configuration[0]+"_"+configuration[2]+"_50_"+configuration[3])
                 
-configuration = ["BabySFC","Generated","fine_tuned_more", "50"]
+configuration = ["PSI","COMSOL","Corners_2", "5"]
 # cond_list = pd.DataFrame(np.array(pd.read_csv("OutputBabySFC/COMSOL_Fields/airss_end_conds_50_50_finalised_run.csv")), columns = ["before","after"])
 #sns.relplot(x=cond_list.index, y="before", data=cond_list);
 
