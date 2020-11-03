@@ -11,14 +11,14 @@ import numpy as np # For numerical fast numerical calculations
 import pandas as pd # Deals with data
 import seaborn as sns # Makes beautiful plots
 
-configuration = ["PSI","COMSOL","Corners_2", "5"]
+configuration = ["PSI","Generated","Corners_2", "20"]
 sns.set_theme(style="darkgrid")
 
 poi_list = pd.DataFrame(np.array(pd.read_csv("Output"+configuration[0]+"/"+configuration[1]+"_Fields/poi/"+configuration[2]+"_50_"+configuration[3]+"_finalised_run.csv", header = None)), columns = ["0","1","2"])
 
 #poi_list = pd.DataFrame(np.array(pd.read_csv("OutputBabySFC/Generated_Fields/num_sens_vals/poi_8_50_5_finalised_run.csv")), columns = ["0","1","2"])
 
-viewing_angle = [0,1]
+viewing_angle = [0,2]
 directions= ["x","y","z"]
 
 fig2 = plt.figure()
@@ -35,7 +35,10 @@ elif  configuration[0] == "PSI":
     msr_dim = [5.0445, 5.0445, 4.71615]
     msr_centre =  [0,0,0.143625]
     
-
+if configuration[0] == "PSI":
+    title_1 = "n2EDM"
+elif configuration[0] == "BabySFC":
+    title_1 = "Prototype"
 
 
 
@@ -51,13 +54,13 @@ ax2.add_patch(patches.Rectangle(coils_corner,coils_dim[viewing_angle[0]],coils_d
 ax2.add_patch(patches.Rectangle(msr_corner,msr_dim[viewing_angle[0]],msr_dim[viewing_angle[1]], fill=False, color = 'red'))
 end_poi, = plt.plot(np.array(poi_list.values)[-9:-1,viewing_angle[0]], np.array(poi_list.values)[-9:-1,viewing_angle[1]], 'kx', label = "End")
 start_poi, = plt.plot(np.array(poi_list.values)[0:8,viewing_angle[0]], np.array(poi_list.values)[0:8,viewing_angle[1]], 'rx', Label = "Start")
-plt.title("POI for the Descent: \n ["+configuration[0]+","+configuration[1]+", "+configuration[2]+", 50:"+configuration[3]+"]")
+plt.title("POI for the Descent: \n ["+title_1+","+configuration[1]+", "+"Corners"+", 50:"+configuration[3]+"]")
 plt.xlabel(directions[viewing_angle[0]]+" [m]")
 plt.ylabel(directions[viewing_angle[1]]+" [m]")
 
 first_legend = plt.legend(handles = [start_poi, end_poi], loc='best')
 
-fig2.savefig("WriteUp/"+configuration[1]+"_Plots/"+configuration[0]+"_"+configuration[2]+"_50_"+configuration[3]+"_view_"+str(viewing_angle[1])+"_no_coil", bbox_inches='tight')
+fig2.savefig("WriteUp/"+configuration[1]+"_Plots/"+configuration[0]+"_"+configuration[2]+"_50_"+configuration[3]+"_view_"+str(viewing_angle[1])+"_rework", bbox_inches='tight')
 
 
 

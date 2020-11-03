@@ -24,6 +24,11 @@ for i in range(0, int(len(poi_list)/8)):
     poi_fg_1[i,:] = poi_list.values[8*i+1,:]
     
 
+if configuration[0] == "PSI":
+    title_1 = "n2EDM"
+elif configuration[0] == "BabySFC":
+    title_1 = "Prototype"
+    
 sns.relplot(poi_fg_1[:,0], poi_fg_1[:,3], kind = "line")
 plt.title("Shift in the Condition Number as a Function of Flux Gate Perturbation")
 plt.xlabel("Distance from Optimised Position [m]")
