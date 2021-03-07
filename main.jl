@@ -24,7 +24,7 @@ d = Binomial(1,prob) #Bernoulli distribution, used to generate random perturbati
 
 ## Input fields homogeneous & gradient
 hom_coeff = 50 #coupling coefficient for the homogeneous fields P1-P3 [muT]
-grad_coeff = 50 #coupling coefficient for the linear fields P4-P8 [muT]
+grad_coeff = 20 #coupling coefficient for the linear fields P4-P8 [muT]
 m = hom_coeff*10^-6 # teslas: m rescaled for [T]
 mg = grad_coeff*10^-6 # teslas: mg rescaled for [T]
 
@@ -52,7 +52,7 @@ end
 
 ## Savedata Options
 # gives the save file extension for the generated poi and condition lists
-filename_suffix = "$(hom_coeff)_$(grad_coeff)_finalised_run"
+filename_suffix = "$(hom_coeff)_$(grad_coeff)_corners_recalc"
 ## num_sensors calculation
 print("Determining the ideal number of sensors, ($(setup)):")
 # Descent Parameters: n: number of iterations for the descent, others used to determine a_k, c_k, refer to
@@ -143,6 +143,6 @@ n, a, c, alpha, gamma_var = 1000, 1e-2, 0.01, 0.602, 0.101
 A = n/10
 
 corner_poi, corner_cond = SPSA(side_poi_0,side_poi_1)
-saveresult("Corners", corner_poi, corner_cond )
+saveresult("Corners_recalc", corner_poi, corner_cond )
 
 print("Descent Complete($(setup))")

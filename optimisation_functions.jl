@@ -110,7 +110,7 @@ function coupling_poi(poi)
     if setup == "BabySFC/Generated_Fields" || setup == "PSI/Generated_Fields"
         poi_mat = transpose(reshape(poi, (3,:)))
         poi_val = Array{Float64,2}(undef, length(poi), length(Bgoals))
-        @threads for i in 1:length(Bgoals)
+        for i in 1:length(Bgoals)
             if i >= 4
                 c = m/mg
             else
